@@ -32,18 +32,30 @@ const ContactForm = () => {
     setSubmitStatus(null);
 
     try {
-      // ここにフォーム送信のロジックを実装
-      // 例: API呼び出しなど
-      await new Promise(resolve => setTimeout(resolve, 1000)); // デモ用の遅延
-      setSubmitStatus('success');
-      setFormData({
-        name: '',
-        email: '',
-        phone: '',
-        service: '',
-        message: '',
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
       });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        setSubmitStatus('success');
+        setFormData({
+          name: '',
+          email: '',
+          phone: '',
+          service: '',
+          message: '',
+        });
+      } else {
+        throw new Error(data.message || '送信に失敗しました');
+      }
     } catch (error) {
+      console.error('Error submitting form:', error);
       setSubmitStatus('error');
     } finally {
       setIsSubmitting(false);
@@ -175,7 +187,7 @@ const ContactForm = () => {
                 animate={{ opacity: 1 }}
                 className="text-center text-green-600 font-medium"
               >
-                お問い合わせありがとうございます。担当者より順次ご連絡させていただきます。
+                お問い合わせありがとうございます。確認メールをお送りしましたので、ご確認ください。担当者より順次ご連絡させていただきます。
               </motion.div>
             )}
 
@@ -195,4 +207,4 @@ const ContactForm = () => {
   );
 };
 
-export default ContactForm; 
+export default ContactForm;    
